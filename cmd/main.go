@@ -1,15 +1,15 @@
 package main
 
 import (
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello Blog\n"))
+	router := gin.Default()
+
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "Hello, Blog!"})
 	})
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		panic(err)
-	}
+	router.Run(":8080")
 }
