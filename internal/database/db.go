@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func ConnectDB() {
-	connstr := fmt.Sprintf(
+func ConnectDB() (*pgxpool.Pool, error) {
+	connStr := fmt.Sprintf(
 		"postgres://%s:%s@%s/%s",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
@@ -17,5 +17,16 @@ func ConnectDB() {
 		os.Getenv("DB_NAME"),
 	)
 
-	conn, err := pgx.Connect(context.Background(), connstr)
+	pool, err := pgxpool.New(context.Background(), connStr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = pool.Ping(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	return pool, nil
 }

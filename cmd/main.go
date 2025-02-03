@@ -1,10 +1,22 @@
 package main
 
 import (
+	"blog-go/internal/database"
+	"log"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+
+	db, err := database.ConnectDB()
+
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	defer db.Close()
+
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
