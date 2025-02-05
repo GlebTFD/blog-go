@@ -6,9 +6,13 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 func ConnectDB() (*pgxpool.Pool, error) {
+
+	godotenv.Load()
+
 	connStr := fmt.Sprintf(
 		"postgres://%s:%s@%s/%s",
 		os.Getenv("DB_USER"),

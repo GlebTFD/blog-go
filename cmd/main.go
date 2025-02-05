@@ -19,8 +19,6 @@ func main() {
 
 	defer db.Close()
 
-	//open web server
-
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
