@@ -9,6 +9,8 @@ import (
 
 func main() {
 
+	//connect to db
+
 	db, err := database.ConnectDB()
 
 	if err != nil {
@@ -16,6 +18,8 @@ func main() {
 	}
 
 	defer db.Close()
+
+	//open web server
 
 	router := gin.Default()
 
