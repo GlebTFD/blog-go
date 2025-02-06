@@ -2,28 +2,27 @@ package main
 
 import (
 	"blog-go/internal/database"
+	"blog-go/internal/handlers"
 	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-
-	//connect to db
-
-	db, err := database.ConnectDB()
-
+	// Connect to db
+	pool, err := database.ConnectDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
+	defer pool.Close()
 
-	defer db.Close()
-
+	// Initializing the router
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Hello, Blog!"})
-	})
+	// Registering routers
+	router.GET("/posts", handlers.GetPosts(pool))
+	router.POST("/posts", handlers.CreatePost(pool))
 
+	//Server run
 	router.Run(":8080")
 }
