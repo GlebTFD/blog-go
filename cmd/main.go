@@ -1,11 +1,12 @@
 package main
 
 import (
-	"blog-go/internal/database"
-	"blog-go/internal/handlers"
 	"log"
 
 	"github.com/gin-gonic/gin"
+
+	"blog-go/internal/database"
+	"blog-go/internal/handlers"
 )
 
 func main() {
@@ -23,6 +24,6 @@ func main() {
 	router.GET("/posts", handlers.GetPosts(pool))
 	router.POST("/posts", handlers.CreatePost(pool))
 
-	//Server run
+	// Server run
 	router.Run(":8080")
 }
