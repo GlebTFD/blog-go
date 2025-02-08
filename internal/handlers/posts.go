@@ -1,17 +1,23 @@
 package handlers
 
 import (
-	"blog-go/internal/models"
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"blog-go/internal/models"
 )
 
 func GetPosts(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		rows, err := pool.Query(context.Background(), "SELECT id, title, content, author_id FROM posts")
+		rows, err := pool.Query(
+			context.Background(),
+			"SELECT id, title, content, author_id FROM posts",
+		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Failed to fetch posts: " + err.Error(),
@@ -60,5 +66,27 @@ func CreatePost(pool *pgxpool.Pool) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusCreated, post)
+	}
+}
+
+func GetPostByID(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		var post models.Post
+
+		err := pool.QueryRow(context.Background(), "SELECT id, title, content, author_id FROM posts WHERE id = $1", id).
+			Scan(&post.ID, &post.Title, &post.Content, &post.AuthorID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Failed to fetch post: " + err.Error(),
+				})
+			}
+			return
+		}
+
+		c.JSON(http.StatusOK, post)
 	}
 }
