@@ -24,8 +24,8 @@ func main() {
 	router.GET("/posts", handlers.GetPosts(pool))
 	router.GET("/posts/:id", handlers.GetPostByID(pool))
 	router.POST("/posts", handlers.CreatePost(pool))
-	// router.PUT("/posts/:id", handlers.UpdatePost(pool))
-	// router.DELETE("/posts/:id", handlers.DeletePost(pool))
+	router.PUT("/posts/:id", handlers.UpdatePost(pool))
+	router.DELETE("/posts/:id", handlers.DeletePost(pool))
 
 	// Run server
 	router.Run(":8080")

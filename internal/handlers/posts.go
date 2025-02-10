@@ -90,3 +90,52 @@ func GetPostByID(pool *pgxpool.Pool) gin.HandlerFunc {
 		c.JSON(http.StatusOK, post)
 	}
 }
+
+func UpdatePost(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		var post models.Post
+
+		if err := c.ShouldBindJSON(&post); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid request: " + err.Error(),
+			})
+			return
+		}
+
+		_, err := pool.Exec(
+			context.Background(),
+			"UPDATE posts SET title = $1, content = $2 WHERE id = $3",
+			post.Title,
+			post.Content,
+			id,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to update post: " + err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, post)
+	}
+}
+
+func DeletePost(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+
+		_, err := pool.Exec(
+			context.Background(),
+			"DELETE FROM posts WHERE id = $1",
+			id,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to delete post: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Post deleted"})
+	}
+}
